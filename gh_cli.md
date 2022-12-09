@@ -22,7 +22,7 @@ create-pod-pr:          !team="$( gh team-members $TEAM_ENV)"; [ -n "$team" ] &&
 list-branches:          !printf "  %-35.35s | %-50.50s  \n\n" "Repo" "Current Branch" && gh repo list $GIT_ORG --json name --jq ".[].name" | xargs -L1 -I {} sh -c "cd $ORG_GIT_ROOT/{} 2> /dev/null && echo {} && git branch --show-current" | xargs -n 2 | xargs -L1 -I {} sh -c "printf \"| %-35.35s | %-50.50s |\n\" {}
 default-branch:         !gh api /repos/{owner}/{repo} --jq '.default_branch'
 list-team-prs:          !gh team-members-new-line $TEAM_ENV | xargs -L1 -I {} gh search prs --state=open --review-requested=@me --json url --author {} --jq ".[].url"
-list-team-prs--open:    !gh team-members-new-line sp-o-a-pod | xargs -L1 -I {} gh search prs --state=open --json url --author {} --jq ".[].url"
+list-team-prs--open:    !gh team-members-new-line $TEAM_ENV | xargs -L1 -I {} gh search prs --state=open --json url --author {} --jq ".[].url"
 needs-review:           !gh search prs --state=open --review-requested=@me --sort created --json url --jq ".[].url"
 pr-branch-name:         !gh pr list --json url,headRefName --jq ".[] | select(.url == \"$1\") | .headRefName"
 team-members:           !gh api orgs/u21/teams/$1/members --jq '[.[].login] | join(",")'
