@@ -20,15 +20,15 @@ clup-all:	!gh repo list u21 --json name --jq ".[].name" | xargs -L1 -I {} sh -c 
 co:	pr checkout
 co-default:	!branch="$( gh default-branch)"; [ -n "$branch" ] &&  git checkout $branch
 co-pr:	!gh clean-up && gh pr-branch-name $1 | xargs git checkout
-create-pod-pr:	!team="$( gh team-members sp-o-a-pod)"; [ -n "$team" ] &&  gh pr create -r "$team" -r "u21/sp-o-a-pod"
+create-pod-pr:	!team="$( gh team-members $TEAM_ENV)"; [ -n "$team" ] &&  gh pr create -r "$team" -r "$ORG/$TEAM_ENV"
 default-branch:	!gh api /repos/{owner}/{repo} --jq '.default_branch'
 list-branches:	!printf "  %-35.35s | %-50.50s  \n\n" "Repo" "Current Branch" && gh repo list $GIT_ORG --json name --jq ".[].name" | xargs -L1 -I {} sh -c "cd $ORG_GIT_ROOT/{} 2> /dev/null && echo {} && git branch --show-current" | xargs -n 2 | xargs -L1 -I {} sh -c "printf \"| %-35.35s | %-50.50s |\n\" {}"
 list-devex-prs:	!gh search prs --state=open --review-requested=u21/developer-productivity --json url --jq ".[].url"
-list-team-prs:	!gh team-members-new-line sp-o-a-pod | xargs -L1 -I {} gh search prs --state=open --review-requested=@me --json url --author {} --jq ".[].url"
-list-team-prs--open:	!gh team-members-new-line sp-o-a-pod | xargs -L1 -I {} gh search prs --state=open --json url --author {} --jq ".[].url"
+list-team-prs:	!gh team-members-new-line $TEAM_ENV | xargs -L1 -I {} gh search prs --state=open --review-requested=@me --json url --author {} --jq ".[].url"
+list-team-prs--open:	!gh team-members-new-line $TEAM_ENV | xargs -L1 -I {} gh search prs --state=open --json url --author {} --jq ".[].url"
 needs-review:	!gh search prs --state=open --review-requested=@me --sort created --json url --jq ".[].url"
 open-devex-prs:	!gh search prs --state=open --review-requested=u21/developer-productivity --json url --jq ".[].url" | xargs -L1 -I {} open {}
-open-team-prs:	!gh team-members-new-line sp-o-a-pod | xargs -L1 -I {} gh search prs --state=open --review-requested=@me --json url --author {} --jq ".[].url" | xargs -L1 -I {} open {}
+open-team-prs:	!gh team-members-new-line $TEAM_ENV | xargs -L1 -I {} gh search prs --state=open --review-requested=@me --json url --author {} --jq ".[].url" | xargs -L1 -I {} open {}
 pr-branch-name:	!gh pr list --json url,headRefName --jq ".[] | select(.url == \"$1\") | .headRefName"
 pull-repos:	!gh repo list u21 --json name --jq ".[].name" | xargs -L1 -I {} sh -c "cd /Users/garrypolley/dev/unit21/{} && pwd && git pull || true"
 team-members:	!gh api orgs/u21/teams/$1/members --jq '[.[].login] | join(",")'
@@ -91,3 +91,53 @@ gh create-pod-pr
 ```
 
 This will then walk you through the steps of creating the PR just like the usual `gh create pr` does.
+
+### gh list-team-prs--open
+
+This will list out all PRs the team has open -- even if I've already reviewed them. It will have the same or more than the `gh list-team-prs` command.
+
+```sh
+➜  ~ gh list-team-ORG--open
+https://github.com/ORG/REPO/pull/1475
+https://github.com/ORG/REPO/pull/3125
+https://github.com/ORG/REPO/pull/4330
+https://github.com/ORG/REPO/pull/4318
+https://github.com/ORG/REPO/pull/3997
+https://github.com/ORG/REPO/pull/3276
+https://github.com/ORG/REPO/pull/4337
+https://github.com/ORG/REPO/pull/59
+https://github.com/ORG/REPO/pull/65
+https://github.com/ORG/REPO/pull/3533
+https://github.com/ORG/REPO/pull/3104
+https://github.com/ORG/REPO/pull/4314
+```
+
+### gh list-branches
+
+This command may be used to show all your currently checked out branches for the organization you've set.
+
+|ENV| Meaning|
+|--|--|
+|ORG_GIT_ROOT| the root you've done a checkout of your org, assumes you've checked out all org repos in one folder|
+|GIT_ORG| is the name for your org -- assumes it matches across all repos and that you're in one org |
+
+
+```sh
+➜  ~ gh list-branches
+  Repo                                | Current Branch
+
+| repo1                               | get-image-working-again                            |
+| repo2                               | dd-hotfix/20221202                                 |
+| repo3                               | master                                             |
+| repo4                               | bug/sc-36576/ttt-namey-for-thing                   |
+| repo5                               | dd-hotfix/20221202                                 |
+| repo6                               | dd-hotfix/20221202                                 |
+| repo7                               | bug/sc-36576/tty-namey-for-thing                   |
+| repo8                               | master                                             |
+| repo9                               | master                                             |
+| repo10                              | main                                               |
+| repo11                              | master                                             |
+| repo12                              | main                                               |
+```
+
+Can be helpful to know the state of your locally running system. Especialy when repositories have dependencies on one another.

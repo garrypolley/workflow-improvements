@@ -24,7 +24,8 @@ co-default:             !branch="$( gh default-branch)"; [ -n "$branch" ] &&  gi
 co-pr:                  !gh clean-up && gh pr-branch-name $1 | xargs git checkout
 create-pod-pr:          !team="$( gh team-members $TEAM_ENV)"; [ -n "$team" ] &&  gh pr create -r "$team" -r "$ORG/$TEAM_ENV"
 default-branch:         !gh api /repos/{owner}/{repo} --jq '.default_branch'
-list-team-prs:          !gh team-members-new-line $TEAM_ENV | xargs -L1 -I {} gh search prs --state=open --review-requested=@me --json url --author ...
+list-team-prs:          !gh team-members-new-line $TEAM_ENV | xargs -L1 -I {} gh search prs --state=open --review-requested=@me --json url --author {} --jq ".[].url"
+list-team-prs--open:    !gh team-members-new-line $TEAM_ENV | xargs -L1 -I {} gh search prs --state=open --json url --author {} --jq ".[].url"
 needs-review:           !gh search prs --state=open --review-requested=@me --sort created --json url --jq ".[].url"
 pr-branch-name:         !gh pr list --json url,headRefName --jq ".[] | select(.url == \"$1\") | .headRefName"
 team-members:           !gh api orgs/u21/teams/$1/members --jq '[.[].login] | join(",")'
