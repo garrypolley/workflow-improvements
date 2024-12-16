@@ -2,6 +2,23 @@
 
 Contains helpers that make my day-to-day workflow easier
 
+## psqlrc
+
+This file sets up the psql history and a few nice aliases. 
+
+* `check_index_creation` - shows the progress of index creation
+* `list_blocked` - shows the blocked queries
+* `list_blocked_no_limit` - shows the blocked queries without a limit
+* `list_long_running` - shows the long running queries
+* `list_long_running_no_limit` - shows the long running queries without a limit
+
+Use these via a psql session like this:
+
+```psql
+:check_index_creation
+```
+
+
 ## GH cli
 
 Here is what I've done to make gh cli a lot easier to manage and deal with. It makes working in git a lot
