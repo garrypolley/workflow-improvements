@@ -29,6 +29,20 @@ brew install gh
 gh auth login
 ```
 
+The settings I have in place are:
+
+Seen via `gh config list`
+
+```sh
+git_protocol=ssh
+editor=vi
+prompt=enabled
+prefer_editor_prompt=disabled
+pager=cat
+http_unix_socket=
+browser=
+```
+
 ### GH cli aliases
 
 See [gh_cli.md](gh_cli.md) for the full list of aliases and their usages.
