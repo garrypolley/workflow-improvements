@@ -16,6 +16,8 @@ gh auth login
 
 See [gh_cli.md](gh_cli.md) for the full list of aliases and their usages.
 
+Import via `gh alias import gh_alias.yml`
+
 ```sh
 clean-up:               !gh co-default && git pull
 clup:                   !gh clean-up
